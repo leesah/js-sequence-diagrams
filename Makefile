@@ -26,7 +26,7 @@ build/diagram-grammar.js: src/diagram.js build/grammar.js
 	#
 	jspp $< > $@ || (rm $@ && exit 127)
 
-build/sequence-diagram-min.js build/sequence-diagram-min.js.map: src/copyright.js build/diagram-grammar.js src/jquery-plugin.js fonts/daniel/daniel_700.font.js src/sequence-diagram.js
+build/sequence-diagram-min.js build/sequence-diagram-min.js.map: src/copyright.js build/diagram-grammar.js src/jquery-plugin.js fonts/daniel/daniel_700.font.js src/sequence-diagram.js fonts/FontAwesome/FontAwesome_400.font.js
 	#
 	# Please ignore the warnings below (these are in combined js code)
 	#

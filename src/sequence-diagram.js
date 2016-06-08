@@ -472,11 +472,11 @@
 			var bX = getCenterX( signal.actorB );
 
 			// Mid point between actors
-			var x = (bX - aX) / 2 + aX;
+			var x = aX + SIGNAL_MARGIN + SIGNAL_PADDING; //(bX - aX) / 2 + aX;
 			var y = offsetY + SIGNAL_MARGIN + 2*SIGNAL_PADDING;
 
 			// Draw the text in the middle of the signal
-			this.draw_text(x, y, signal.message, this._font);
+			this.draw_text_left_aligned(x, y, signal.message, this._font);
 
 			// Draw the line along the bottom of the signal
 			y = offsetY + signal.height - SIGNAL_MARGIN - SIGNAL_PADDING;
@@ -517,7 +517,7 @@
 					throw new Error("Unhandled note placement:" + note.placement);
 			}
 
-			this.draw_text_box(note, note.message, NOTE_MARGIN, NOTE_PADDING, this._font);
+			this.draw_text_box_left_aligned(note, note.message, NOTE_MARGIN, NOTE_PADDING, this._font);
 		},
 
 		/**
@@ -543,6 +543,29 @@
 			t.toFront();
 		},
 
+		/**
+		 * Draws text with a white background
+		 * x,y (int) x,y center point for this text
+		 * TODO Horz center the text when it's multi-line print
+		 */
+		draw_text_left_aligned : function (x, y, text, font) {
+			var paper = this._paper;
+			var f = font || {};
+			var t;
+			if (f._obj) {
+				t = paper.print_center(x, y, text, f._obj, f['font-size']);
+			} else {
+				t = paper.text(x, y, text).attr({'text-anchor': 'start'});
+				t.attr(f);
+			}
+			// draw a rect behind it
+			var bb = t.getBBox();
+			var r = paper.rect(bb.x, bb.y, bb.width, bb.height);
+			r.attr({'fill': "#fff", 'stroke': 'none'});
+
+			t.toFront();
+		},
+
 		draw_text_box : function (box, text, margin, padding, font) {
 			var x = box.x + margin;
 			var y = box.y + margin;
@@ -558,6 +581,22 @@
 			y = getCenterY(box);
 
 			this.draw_text(x, y, text, font);
+		},
+
+		draw_text_box_left_aligned : function (box, text, margin, padding, font) {
+			var x = box.x + margin;
+			var y = box.y + margin;
+			var w = box.width  - 2 * margin;
+			var h = box.height - 2 * margin;
+
+			// Draw inner box
+			var rect = this.draw_rect(x, y, w, h);
+			rect.attr(LINE);
+
+			// Draw text (in the center)
+			y = getCenterY(box);
+
+			this.draw_text_left_aligned(x + padding, y, text, font);
 		}
 
 		/**
@@ -593,6 +632,25 @@
 	});
 
 /******************
+ * AwesomeTheme
+ ******************/
+
+	var AwesomeTheme = function(diagram) {
+		this.init(diagram);
+	};
+
+	_.extend(AwesomeTheme.prototype, BaseTheme.prototype, {
+
+		init_font : function() {
+			this._font = {
+				'font-size': 16,
+				'font-family': 'FontAwesome, "WenQuanYi Zen Hei", Monospace'
+			};
+		}
+
+	});
+
+/******************
  * HandRaphaelTheme
  ******************/
 
@@ -622,6 +680,7 @@
 
 	var themes = {
 		simple : RaphaelTheme,
+		awesome : AwesomeTheme,
 		hand  : HandRaphaelTheme
 	};
 
